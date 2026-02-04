@@ -255,24 +255,9 @@
             text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
         }
         
-        .rejection {
-            color: #f44336;
-            font-size: 2.2rem;
-            font-weight: bold;
-            animation: sadShake 0.8s infinite alternate;
-            text-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
-        }
-        
         @keyframes celebrate {
             from { transform: scale(1); text-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
             to { transform: scale(1.08); text-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
-        }
-        
-        @keyframes sadShake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
         }
         
         .counter-container {
@@ -530,17 +515,6 @@
             border-radius: 50%;
         }
         
-        .rain {
-            position: fixed;
-            width: 15px;
-            height: 15px;
-            background-color: #757575;
-            top: -20px;
-            z-index: 1000;
-            opacity: 0;
-            border-radius: 2px;
-        }
-        
         @media (max-width: 768px) {
             .container {
                 padding: 35px 20px;
@@ -588,7 +562,7 @@
                 font-size: 1.3rem;
             }
             
-            .success, .rejection {
+            .success {
                 font-size: 1.8rem;
             }
             
@@ -690,7 +664,7 @@
                         <span class="broken-heart">💔</span> NO <span class="broken-heart">💔</span>
                     </button>
                 </div>
-                <div class="instructions">The "NO" button is a bit shy... try to catch it!</div>
+                <div class="instructions">The "NO" button will always run away... you can only click YES! ❤️</div>
             </div>
             
             <div class="message-container">
@@ -772,7 +746,6 @@
             let noButtonPosition = { x: 0, y: 0 };
             let isMoving = false;
             let yesClicked = false;
-            let noClicked = false;
             
             // Create floating hearts and broken hearts in background
             function createFloatingElements() {
@@ -808,7 +781,7 @@
             
             // Function to move the "No" button to a random position
             function moveNoButton(e) {
-                if (yesClicked || noClicked || isMoving) return; // Don't move if "Yes" or "No" was already clicked
+                if (yesClicked || isMoving) return; // Don't move if "Yes" was already clicked
                 
                 isMoving = true;
                 noBtn.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -904,12 +877,12 @@
                     isMoving = false;
                 }, 500);
                 
-                // Prevent default behavior
+                // ALWAYS prevent clicking on NO button
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    return false;
                 }
-                return false;
             }
             
             // Function to create mini hearts
@@ -998,56 +971,6 @@
                 }, 1500);
             }
             
-            // Function to handle when "No" is clicked
-            function handleNoClick() {
-                noClicked = true;
-                message.innerHTML = "<span class='rejection'>My heart is broken... but I'll always care for you 💔</span>";
-                
-                // Disable both buttons
-                yesBtn.disabled = true;
-                noBtn.disabled = true;
-                
-                // Make the no button bigger and change color
-                noBtn.style.transform = 'scale(1.2)';
-                noBtn.style.background = 'linear-gradient(135deg, #757575, #424242, #212121)';
-                noBtn.style.borderColor = '#000000';
-                noBtn.style.transition = 'all 0.8s ease';
-                noBtn.style.boxShadow = '0 20px 30px rgba(117, 117, 117, 0.5)';
-                noBtn.innerHTML = '<span class="broken-heart">💔</span> NO... <span class="broken-heart">💔</span>';
-                noBtn.style.fontSize = '1.8rem';
-                noBtn.style.padding = '20px 50px';
-                
-                // Create sad effect
-                createBrokenHearts();
-                launchRain();
-                createGrayHearts();
-                
-                // Change background to sad mode
-                body.style.background = 'linear-gradient(135deg, #424242, #616161, #757575)';
-                
-                // Update counter message
-                attemptCounter.parentElement.innerHTML = `You finally clicked "NO" after <span class="counter-number">${noButtonAttempts}</span> attempts... my heart is broken 💔`;
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                // Add a final sad message
-                setTimeout(() => {
-                    const finalMessage = document.createElement('div');
-                    finalMessage.style.marginTop = '25px';
-                    finalMessage.style.fontSize = '1.5rem';
-                    finalMessage.style.color = '#757575';
-                    finalMessage.style.fontWeight = '700';
-                    finalMessage.style.textShadow = '0 0 8px rgba(255, 255, 255, 0.5)';
-                    finalMessage.style.padding = '18px';
-                    finalMessage.style.background = 'rgba(255, 255, 255, 0.9)';
-                    finalMessage.style.borderRadius = '12px';
-                    finalMessage.style.border = '2px solid #757575';
-                    finalMessage.innerHTML = 'I\'ll always cherish the thought of you being my Valentine... 💔';
-                    document.querySelector('.message-container').appendChild(finalMessage);
-                }, 1500);
-            }
-            
             // Function to create celebration hearts
             function createCelebrationHearts() {
                 const celebrationCount = 30;
@@ -1085,43 +1008,6 @@
                 }
             }
             
-            // Function to create broken hearts
-            function createBrokenHearts() {
-                const brokenCount = 30;
-                
-                for (let i = 0; i < brokenCount; i++) {
-                    setTimeout(() => {
-                        const element = document.createElement('div');
-                        element.innerHTML = '💔';
-                        element.style.position = 'fixed';
-                        element.style.fontSize = `${20 + Math.random() * 35}px`;
-                        element.style.color = '#757575';
-                        element.style.left = `${Math.random() * 100}vw`;
-                        element.style.top = `${Math.random() * 100}vh`;
-                        element.style.zIndex = '1000';
-                        element.style.pointerEvents = 'none';
-                        element.style.opacity = '0.9';
-                        element.style.textShadow = '0 0 12px rgba(255, 255, 255, 0.8)';
-                        
-                        document.body.appendChild(element);
-                        
-                        // Animate the element
-                        const animation = element.animate([
-                            { transform: 'translateY(0) scale(1) rotate(0deg)', opacity: 1 },
-                            { transform: `translateY(${200 + Math.random() * 150}px) scale(0.2) rotate(360deg)`, opacity: 0 }
-                        ], {
-                            duration: 2000 + Math.random() * 1500,
-                            easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
-                        });
-                        
-                        // Remove element after animation
-                        animation.onfinish = () => {
-                            element.remove();
-                        };
-                    }, i * 60);
-                }
-            }
-            
             // Function to create heart shower
             function createHeartShower() {
                 for (let i = 0; i < 12; i++) {
@@ -1138,42 +1024,6 @@
                         heart.style.opacity = '0.9';
                         heart.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.9)';
                         heart.style.filter = 'brightness(1.5)';
-                        
-                        document.body.appendChild(heart);
-                        
-                        // Animate the heart falling
-                        const animation = heart.animate([
-                            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                            { transform: `translateY(100vh) rotate(720deg)`, opacity: 0 }
-                        ], {
-                            duration: 2500 + Math.random() * 1500,
-                            easing: 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
-                            delay: Math.random() * 800
-                        });
-                        
-                        // Remove heart after animation
-                        animation.onfinish = () => {
-                            heart.remove();
-                        };
-                    }, i * 150);
-                }
-            }
-            
-            // Function to create gray hearts
-            function createGrayHearts() {
-                for (let i = 0; i < 12; i++) {
-                    setTimeout(() => {
-                        const heart = document.createElement('div');
-                        heart.innerHTML = '💔';
-                        heart.style.position = 'fixed';
-                        heart.style.fontSize = '60px';
-                        heart.style.color = '#757575';
-                        heart.style.left = `${10 + (i * 7)}%`;
-                        heart.style.top = '-80px';
-                        heart.style.zIndex = '999';
-                        heart.style.pointerEvents = 'none';
-                        heart.style.opacity = '0.9';
-                        heart.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.9)';
                         
                         document.body.appendChild(heart);
                         
@@ -1245,70 +1095,35 @@
                 }
             }
             
-            // Function to launch rain
-            function launchRain() {
-                const rainCount = 150;
-                
-                for (let i = 0; i < rainCount; i++) {
-                    setTimeout(() => {
-                        const rain = document.createElement('div');
-                        rain.classList.add('rain');
-                        
-                        // Gray colors for rain
-                        const colors = ['#757575', '#616161', '#424242', '#9E9E9E'];
-                        rain.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                        
-                        // Random position
-                        rain.style.left = `${Math.random() * 100}vw`;
-                        
-                        // Random size
-                        const width = 2 + Math.random() * 4;
-                        const height = 10 + Math.random() * 20;
-                        rain.style.width = `${width}px`;
-                        rain.style.height = `${height}px`;
-                        
-                        document.body.appendChild(rain);
-                        
-                        // Animate rain
-                        const animation = rain.animate([
-                            { top: '-20px', opacity: 0, transform: 'rotate(0deg) scale(0.5)' },
-                            { top: '10px', opacity: 0.7, transform: 'rotate(0deg) scale(1)' },
-                            { top: '100vh', opacity: 0, transform: 'rotate(0deg) scale(0.5)' }
-                        ], {
-                            duration: 2000 + Math.random() * 2000,
-                            delay: Math.random() * 600,
-                            easing: 'linear'
-                        });
-                        
-                        // Remove rain after animation
-                        animation.onfinish = () => {
-                            rain.remove();
-                        };
-                    }, i * 12);
-                }
-            }
-            
             // Event listeners
             yesBtn.addEventListener('click', handleYesClick);
-            noBtn.addEventListener('click', handleNoClick);
             
-            // Make the "No" button move on hover
+            // Make the "No" button move on hover - NO CLICK FUNCTIONALITY
             noBtn.addEventListener('mouseover', moveNoButton);
             
-            // Also move when trying to click (for touch devices and extra security)
+            // Move when trying to click (prevent actual clicking)
             noBtn.addEventListener('click', function(e) {
-                if (!noClicked) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    moveNoButton(e);
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                moveNoButton(e);
+                return false;
             });
             
             // Move when trying to focus with keyboard (tab key)
             noBtn.addEventListener('focus', moveNoButton);
             
             // Move when trying to touch on mobile devices
-            noBtn.addEventListener('touchstart', moveNoButton);
+            noBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                moveNoButton(e);
+                return false;
+            });
+            
+            // Also prevent any other click events
+            noBtn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                return false;
+            });
             
             // Initialize no button position
             const buttonWidth = noBtn.offsetWidth;
@@ -1331,10 +1146,33 @@
             // Occasionally move the button even without interaction
             setInterval(() => {
                 // 8% chance to move on its own
-                if (Math.random() < 0.08 && !yesClicked && !noClicked && !isMoving) {
+                if (Math.random() < 0.08 && !yesClicked && !isMoving) {
                     moveNoButton();
                 }
             }, 3500);
+            
+            // Also add mouse tracking for extra movement
+            buttonsContainer.addEventListener('mousemove', function(e) {
+                if (yesClicked || isMoving) return;
+                
+                const rect = buttonsContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const noBtnRect = noBtn.getBoundingClientRect();
+                const noBtnX = noBtnRect.left - rect.left + noBtnRect.width / 2;
+                const noBtnY = noBtnRect.top - rect.top + noBtnRect.height / 2;
+                
+                const distance = Math.sqrt(
+                    Math.pow(mouseX - noBtnX, 2) + 
+                    Math.pow(mouseY - noBtnY, 2)
+                );
+                
+                // If mouse gets too close to NO button, move it
+                if (distance < 100 && !isMoving) {
+                    moveNoButton();
+                }
+            });
         });
     </script>
 </body>
